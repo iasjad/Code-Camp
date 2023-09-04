@@ -32,8 +32,8 @@ app.use(session({
     secret,
     resave: false,
     saveUninitialized: false,
-    touchAfter: 24 * 3600 
-  }));
+    touchAfter: 24 * 3600
+}));
 const sessionConfig = {
     name: 'session',
     keys: ['thisisone'],
@@ -119,13 +119,20 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-const dbURL = process.env.DB_URL ||'mongodb://127.0.0.1:27017/yelp-camp';
-mongoose.connect(dbURL);
+const dbURL = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
+mongoose.connect(err => {
+    if (err) { console.error(err); return false; }
+    // connection to mongo is successful, listen for requests
+    app.listen(port, () => {
+        console.log(`serving on port ${port}: http://localhost:${port}/`);
+    })
+});
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "Connection Error"));
 db.once("open", () => {
     console.log("Connected to the data base");
 });
+
 
 
 app.use((req, res, next) => {
@@ -153,6 +160,3 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('Error', { err });
 })
 
-app.listen(port, () => {
-    console.log(`serving on port ${port}: http://localhost:${port}/`);
-});
