@@ -123,9 +123,7 @@ const dbURL = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
 mongoose.connect(err => {
     if (err) { console.error(err); return false; }
     // connection to mongo is successful, listen for requests
-    app.listen(port, () => {
-        console.log(`serving on port ${port}: http://localhost:${port}/`);
-    })
+
 });
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "Connection Error"));
@@ -160,3 +158,6 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('Error', { err });
 })
 
+app.listen(port, () => {
+    console.log(`serving on port ${port}: http://localhost:${port}/`);
+})
