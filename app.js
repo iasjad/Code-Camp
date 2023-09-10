@@ -22,6 +22,14 @@ const userRoutes = require('./routers/users');
 const campgrounds = require('./routers/campground');
 const reviews = require('./routers/reviews');
 
+const dbURL = process.env.DB_URL ||'mongodb://127.0.0.1:27017/yelp-camp';
+mongoose.connect(dbURL);
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "Connection Error"));
+db.once("open", () => {
+    console.log("Connected to the data base");
+});
+
 
 const app = express();
 const port = process.env.PORT || 3030;
@@ -32,8 +40,8 @@ app.use(session({
     secret,
     resave: false,
     saveUninitialized: false,
-    touchAfter: 24 * 3600
-}));
+    touchAfter: 24 * 3600 
+  }));
 const sessionConfig = {
     name: 'session',
     keys: ['thisisone'],
@@ -119,18 +127,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-const dbURL = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
-mongoose.connect(err => {
-    if (err) { console.error(err); return false; }
-    // connection to mongo is successful, listen for requests
-
-});
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "Connection Error"));
-db.once("open", () => {
-    console.log("Connected to the data base");
-});
-
 
 
 app.use((req, res, next) => {
@@ -160,4 +156,4 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
     console.log(`serving on port ${port}: http://localhost:${port}/`);
-})
+});
